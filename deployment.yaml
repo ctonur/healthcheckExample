@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: healthcheck-demo:latest  # Önce Docker imajını build etmelisin!
+        ports:
+        - containerPort: 8080
+        securityContext:
+          runAsUser: 1001  # Kullanıcı UID 1001 olarak çalışır
+        livenessProbe:
+          exec:
+            command: ["test", "-f", "/tmp/ready"]
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          exec:
+            command: ["test", "-f", "/tmp/ready"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
